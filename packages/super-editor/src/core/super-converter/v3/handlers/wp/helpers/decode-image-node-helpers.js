@@ -38,12 +38,21 @@ export const translateImageNode = (params) => {
   }
   imageName = sanitizeDocxMediaName(imageName);
 
-  let size = attrs.size
+  const hasExplicitSize = attrs.size?.width && attrs.size?.height;
+  let size = hasExplicitSize
     ? {
         w: pixelsToEmu(attrs.size.width),
         h: pixelsToEmu(attrs.size.height),
       }
     : imageSize;
+
+  // Ensure size is always a valid object with numeric EMU values.
+  // Images from HTML or incomplete imports may lack explicit dimensions.
+  if (!size || !size.w || !size.h) {
+    const fallbackWidthPx = attrs.size?.width || 300;
+    const fallbackHeightPx = attrs.size?.height || 200;
+    size = { w: pixelsToEmu(fallbackWidthPx), h: pixelsToEmu(fallbackHeightPx) };
+  }
 
   if (originalWidth && originalHeight) {
     const boxWidthPx = emuToPixels(size.w);

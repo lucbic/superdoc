@@ -104,6 +104,16 @@ describe('translateImageNode', () => {
     expect(result.elements).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'a:graphic' })]));
   });
 
+  it('should use fallback size when attrs.size is empty', () => {
+    baseParams.node.attrs.size = {};
+
+    const result = translateImageNode(baseParams);
+
+    const extent = result.elements.find((e) => e.name === 'wp:extent').attributes;
+    expect(extent.cx).toBeTruthy();
+    expect(extent.cy).toBeTruthy();
+  });
+
   it('should generate a new relationship if rId is presented but relation is missing', () => {
     baseParams.node.attrs.rId = 'rId123';
     translateImageNode(baseParams);
